@@ -12,23 +12,24 @@ jobs:
     steps:
       # Checkout the repository code
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Correct usage
 
       # Install AWS CLI in the GitHub Actions runner
       - name: Install AWS CLI
         run: |
           sudo apt-get update
-          sudo apt-get install awscli -y
+          sudo apt-get install awscli -y  # Correct usage
 
       # Zip the code in the repository
       - name: Zip repository code
-        run: zip -r code.zip .
+        run: zip -r code.zip .  # Correct usage
 
       # Upload the zipped code to S3
       - name: Upload to S3
-  env:
-    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  run: |
-    TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
-    aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
+          echo "Current TAG_NAME: $TAG_NAME"  # Debugging output
+          aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip  # Replace with your S3 bucket name
