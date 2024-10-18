@@ -23,10 +23,8 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ap-south-1  # Specify your region
+          AWS_DEFAULT_REGION: ap-south-1
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
-          echo "Current TAG_NAME: $TAG_NAME"  # Debugging output
-          export AWS_PAGER=""  # Disable the pager for AWS CLI
-          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip 2>&1)  # Upload and capture output
-          echo "$OUTPUT"  # Output AWS CLI results
+          echo "Current TAG_NAME: $TAG_NAME"
+          aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug  # Added --debug
