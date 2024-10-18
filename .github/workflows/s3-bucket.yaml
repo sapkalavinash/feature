@@ -32,9 +32,14 @@ jobs:
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
           echo "Current TAG_NAME: $TAG_NAME"  # Debugging output
-          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug 2>&1)
-          echo "$OUTPUT"
+          
+          # Try uploading to S3 and capture both output and error
+          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip 2>&1)
+          echo "$OUTPUT"  # Output AWS CLI results
+          
+          # Check if the command succeeded
           if [[ $? -ne 0 ]]; then
-              echo "AWS CLI command failed"
+              echo "AWS CLI command failed with exit code $?. Output:"
+              echo "$OUTPUT"
               exit 1
           fi
