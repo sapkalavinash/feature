@@ -14,12 +14,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Install AWS CLI in the GitHub Actions runner
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install awscli -y
-
       # Zip the code in the repository
       - name: Zip repository code
         run: zip -r code.zip .
@@ -29,17 +23,10 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1  # Specify your region
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
           echo "Current TAG_NAME: $TAG_NAME"  # Debugging output
-          
-          # Try uploading to S3 and capture both output and error
-          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip 2>&1)
+          export AWS_PAGER=""  # Disable the pager for AWS CLI
+          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip 2>&1)  # Upload and capture output
           echo "$OUTPUT"  # Output AWS CLI results
-          
-          # Check if the command succeeded
-          if [[ $? -ne 0 ]]; then
-              echo "AWS CLI command failed with exit code $?. Output:"
-              echo "$OUTPUT"
-              exit 1
-          fi
