@@ -10,25 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout the repository code
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # Install AWS CLI in the GitHub Actions runner
       - name: Install AWS CLI
         run: |
           sudo apt-get update
           sudo apt-get install awscli -y
 
+      # Zip the code in the repository
       - name: Zip repository code
         run: zip -r code.zip .
 
+      # Upload the zipped code to S3
       - name: Upload to S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         run: |
-          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
-          echo "Current TAG_NAME: $TAG_NAME"
-          if ! aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug; then
+          TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")  # Get the current tag name
+          echo "Current TAG_NAME: $TAG_NAME"  # Debugging output
+          OUTPUT=$(aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug 2>&1)
+          echo "$OUTPUT"
+          if [[ $? -ne 0 ]]; then
               echo "AWS CLI command failed"
               exit 1
           fi
