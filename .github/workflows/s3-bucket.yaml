@@ -28,4 +28,7 @@ jobs:
         run: |
           TAG_NAME=$(echo "${GITHUB_REF#refs/tags/}")
           echo "Current TAG_NAME: $TAG_NAME"
-          aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug
+          if ! aws s3 cp code.zip s3://crego-jupiter-web/$TAG_NAME/code.zip --debug; then
+              echo "AWS CLI command failed"
+              exit 1
+          fi
